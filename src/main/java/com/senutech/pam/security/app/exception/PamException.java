@@ -4,59 +4,74 @@ import com.senutech.pam.security.app.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
 
 public class PamException extends Exception {
-    private static Logger logger = LoggerFactory.getLogger(PamException.class);
+    private static final Logger logger = LoggerFactory.getLogger(PamException.class);
 
-    private String id = UUID.randomUUID().toString().toUpperCase();
-    private OffsetDateTime timestamp = OffsetDateTime.now(ZoneOffset.UTC);
-    private String userMessage = String.format("Exception ID %s",id.toString());
+    private final String id = UUID.randomUUID().toString().toUpperCase();
+    private final OffsetDateTime timestamp = OffsetDateTime.now(ZoneOffset.UTC);
+    private boolean clientDataError = false;
+    private String userMessage = "";
     private String objectContext;
+    private final List<ValidationError> validationErrors = new ArrayList<ValidationError>();
 
 
     public PamException(String message) {
-
         super(message);
     }
+    public PamException(String message, String userMessage) {
+        super(message);
+        this.userMessage = userMessage;
+        this.clientDataError = true;
+    }
+    public PamException(String userMessage,List<ValidationError> details) {
+        super("Validation Errors");
+        this.userMessage = userMessage;
+        if (details != null && details.size() >0) {
+            this.validationErrors.addAll(details);
+            clientDataError = true;
+        }
+    }
+
     public PamException(String message, Throwable rootCause) {
         super(message,rootCause);
         log(this);
     }
     public PamException(String message,Object objCOntext) {
         super(message);
-        this.userMessage = userMessage;
         this.objectContext = createObjectContext(objCOntext);
         log(this);
     }
 
     public PamException(String message, Object objCOntext, Throwable rootCause) {
         super(message,rootCause);
-        this.userMessage = userMessage;
         this.objectContext = createObjectContext(objCOntext);
         log(this);
     }
 
     public String getId() { return id;}
     public OffsetDateTime getTimestamp() { return timestamp;}
+    public List<ValidationError> getValidationErrors() { return validationErrors;}
     public String getUserMessage() { return userMessage;}
+    public boolean isClientDataError() { return this.clientDataError;}
 
     public String getObjectContext() { return objectContext;}
 
 
     private static void log(PamException ex) {
-        String msg = String.format("Exception ID: %s: %s\n%s\n\n",ex.id.toString(),ex.getMessage(),ex.objectContext );
+        String msg = String.format("Exception ID: %s: %s\n%s\n\n",ex.id,ex.getMessage(),ex.objectContext );
         logger.error(msg,ex);
     }
 
     public static PamException normalize(String message, Throwable ex) {
-        PamException pe = null;
+        PamException pe;
         if(ex instanceof PamException) {
             pe = (PamException) ex;
         } else {
@@ -66,7 +81,7 @@ public class PamException extends Exception {
         return pe;
     }
     public static PamException normalize(String message, Object context, Throwable ex) {
-        PamException pe = null;
+        PamException pe;
         if(ex instanceof PamException) {
             pe = (PamException) ex;
         } else {
@@ -76,7 +91,7 @@ public class PamException extends Exception {
     }
 
     public static PamException normalize(String message, Object context) {
-        PamException pe = null;
+        PamException pe;
         pe = new PamException(message,context);
         return pe;
     }

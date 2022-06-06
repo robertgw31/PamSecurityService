@@ -1,0 +1,84 @@
+spring:
+  mail:
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            port: '587'
+          starttls:
+            enable: 'true'
+          auth: 'true'
+        smpt:
+          startttls:
+            requied: 'true'
+      smtp:
+        ssl:
+          enable: 'true'
+    username: sendmail@senutech.com
+    port: '587'
+    debug: 'true'
+    from: no-reply@senutech.com
+    host: smtp.office365.com
+    protocol: smtp
+    password: Mel!ssa1005
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8083/auth/realms/baeldung
+          jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
+  datasource:
+    driverClassName: org.postgresql.Driver
+    timeBetweenEvictionRunsMillis: '3600000'
+    testWhileIdle: 'true'
+    validationQuery: SELECT 1
+    platform: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: 'true'
+    show-sql: 'true'
+  config:
+    additional-location: ./config
+  autoconfigure:
+    exclude[0]: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: 'false'
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+
+mail:
+  debug: 'true'
+  smtp:
+    starttls:
+      enable: 'false'
+  template:
+    folder: templates
+
+
+server:
+  port: 8080
+  servlet:
+    context-path: /resource-server
+
+logging:
+#  pattern:
+#    file: '%d %p %c{1.} [%t] %m%n'
+#    console: '%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n'
+#  level:
+#    com:
+#      mkyong: DEBUG
+#    org:
+#      springframework: ERROR
+#    root: DEBUG
+#  file:
+#    path: 'logs/pam-security-app_{YYYY-MM-DD}_{HH-mm-ss}.log'
+  config: 'lasspath:logback-spring.xml'

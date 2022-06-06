@@ -1,4 +1,4 @@
-package com.senutech.pam.app;
+package com.senutech.pam.security.app;
 
 import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.model.domain.Tranaudit;

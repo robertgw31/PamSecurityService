@@ -1,9 +1,8 @@
-package com.senutech.pam.app.service;
+package com.senutech.pam.security.app.service;
 
 
 import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.model.domain.Userlogin;
-import com.senutech.pam.security.app.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes= SecurityApp.class)
-public class EmailServiceTester {
+public class EmailServiceTest {
 
     @Autowired
     private EmailService emailService;

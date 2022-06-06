@@ -1,12 +1,12 @@
 package com.senutech.pam.security.app.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
+@Getter
+@Setter
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
 public class ValidationError extends ExceptionDetail {
     private String objectContext;
     private String fieldName;

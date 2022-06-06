@@ -1,4 +1,4 @@
-package com.senutech.pam.security.app.exception;
+package com.senutech.pam.security.app.model.containers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class ExceptionDetail {
-    private String description;
+public class ResultBase {
+    private boolean success = true;
 }
-
-

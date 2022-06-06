@@ -1,5 +1,5 @@
 
-/target/**
-/out/**
-/log/**
+/target
+/out
+/log
 **/.DS_Store

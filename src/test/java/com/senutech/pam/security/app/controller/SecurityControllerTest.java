@@ -1,80 +1,104 @@
-package com.senutech.pam.app.controller;
+package com.senutech.pam.security.app.controller;
 
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.senutech.pam.security.app.SecurityApp;
-import com.senutech.pam.security.app.controller.SecurityController;
+import com.senutech.pam.security.app.controller.response.ApiErrorResponse;
 import com.senutech.pam.security.app.model.containers.AccountCreateClientResult;
 import com.senutech.pam.security.app.model.containers.AccountCreateRequest;
 import com.senutech.pam.security.app.model.containers.AccountCreateResult;
 import com.senutech.pam.security.app.model.domain.*;
-import com.senutech.pam.security.app.service.SecurityService;
 import com.senutech.pam.security.app.util.AccountStatus;
+import com.senutech.pam.security.app.util.JsonUtil;
 import com.senutech.pam.security.app.util.RequestType;
 import com.senutech.pam.security.app.util.UserLoginStatus;
+import org.apache.catalina.core.ApplicationContext;
+
 import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
+import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.server.RequestPredicates;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.postgresql.hostchooser.HostRequirement.any;
 import static org.springframework.http.RequestEntity.post;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 //@TestPropertySource(locations = "classpath:application-test.properties")
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes= SecurityApp.class)
-@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 public class SecurityControllerTest {
 
-    @InjectMocks
-    private SecurityController securityController;
-
-    @Mock
-    private SecurityService securityService;
+    private static final Logger logger = LoggerFactory.getLogger(SecurityControllerTest.class);
 
     @Autowired
-    private MockMvc mockMvc;
+    protected MockMvc mvc;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
 
+    @Test
+    public void testGetAllUsers() {
 
-    private static final ObjectMapper mapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .build();
+        try {
+            String uri = "/s/allusers";
+            MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                    .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
+            int status = mvcResult.getResponse().getStatus();
+            assertEquals(200, status);
+            String content = mvcResult.getResponse().getContentAsString();
+            Userlogin[] loginList = objectMapper.readValue(content, Userlogin[].class);
+            assertTrue(loginList.length > 0);
+
+        } catch(Exception e) {
+            logger.error("",e);
+            e.printStackTrace(System.err);
+        }
+    }
 
     @Test
     public void testCreateAccount() {
@@ -86,9 +110,9 @@ public class SecurityControllerTest {
         OffsetDateTime timestamp = OffsetDateTime.now(zone);
         String verificationUrl = "http://www.cnn.com";
         try {
-        AccountCreateRequest request = new AccountCreateRequest();
+            AccountCreateRequest request = new AccountCreateRequest();
 
-            request.setAccountName("Robert Wittnebert");
+            //request.setAccountName("Robert Wittnebert");
             request.setIsoCountry("US");
             request.setIsoLanguage("EN");
             request.setLoginEmail("robertw@senutech.com");
@@ -100,19 +124,39 @@ public class SecurityControllerTest {
             request.setUserLocalDateTime(timestamp);
             request.setEmailVerificationUrlRoot(verificationUrl);
 
-           // when(securityService.createAccount(request)).thenReturn(createResult(request));
-            when(securityService.createAccount(any())).thenReturn(createResult(request));
-            RequestBuilder requestBuilder = MockMvcRequestBuilders.post(requestPath)
-                    .accept(MediaType.APPLICATION_JSON_VALUE)
-                    .content(mapper.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE);
+            String jsonRequest = objectMapper.writeValueAsString(request);
+            MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(requestPath)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonRequest)
+                    .accept(MediaType.APPLICATION_JSON)).andReturn();
 
-            MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-            MockHttpServletResponse response = result.getResponse();
-            String strResult = response.getContentAsString();
-            AccountCreateClientResult accountCreateResult = mapper.readValue(strResult,AccountCreateClientResult.class);
+            int status = mvcResult.getResponse().getStatus();
+            String content = mvcResult.getResponse().getContentAsString();
+            if (status == 200) {
+                AccountCreateClientResult result = objectMapper.readValue(content, AccountCreateClientResult.class);
+                assertNotNull(result);
+                String prettyJson = JsonUtil.objectToPrettyJson(result);
+                logger.debug(prettyJson);
+            } else {
+                ApiErrorResponse result = objectMapper.readValue(content, ApiErrorResponse.class);
+                assertNotNull(result);
+                String prettyJson = JsonUtil.objectToPrettyJson(result);
+                logger.debug(prettyJson);
+                System.err.println(prettyJson);
+                if (result.getSubErrors() != null && result.getSubErrors().size() >0) {
+                    logger.debug("Sub errors exist");
+                    System.err.println("Sub errors exist:");
+                    result.getSubErrors().forEach(s -> {
+                        String se = String.format("\tObject '%s' field '%s' %s for value '%s'",s.getObjectContext(),s.getFieldName(), s.getMessage(),s.getRejectedValue());
+                        logger.debug(se);
+                        System.err.println(se);
+                    });
+                }
+
+            }
 
         } catch(Exception e) {
+            logger.error("",e);
             e.printStackTrace(System.err);
         }
     }

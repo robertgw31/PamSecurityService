@@ -1,5 +1,6 @@
 package com.senutech.pam.security.app.model.containers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,8 @@ import java.util.UUID;
 public class AccountCreateRequest {
 
     // these from the client
+
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
     private OffsetDateTime userLocalDateTime;
     private String isoLanguage;
     private String isoCountry;
@@ -30,11 +33,13 @@ public class AccountCreateRequest {
 
     // these at the application boundry
     private String clientMachine;
+
     private OffsetDateTime requestRecieptTime;
     private String EmailVerificationUrlRoot;
 
     // these are set within the service
     private UUID id;
+
     private OffsetDateTime timestamp;
     private OffsetDateTime openDateTime;
 
