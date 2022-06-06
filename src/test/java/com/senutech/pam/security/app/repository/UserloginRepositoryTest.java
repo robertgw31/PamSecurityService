@@ -1,11 +1,9 @@
-package com.senutech.pam.app.repository;
+package com.senutech.pam.security.app.repository;
 
-import com.senutech.pam.app.TesterBase;
 import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.exception.PamException;
 import com.senutech.pam.security.app.model.domain.Tranaudit;
 import com.senutech.pam.security.app.model.domain.Userlogin;
-import com.senutech.pam.security.app.repository.UserloginRepository;
 import com.senutech.pam.security.app.util.Constants;
 import com.senutech.pam.security.app.util.JsonUtil;
 import com.senutech.pam.security.app.util.UserLoginStatus;
@@ -23,7 +21,7 @@ import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes= SecurityApp.class)
-public class UserloginRepositoryTester  {
+public class UserloginRepositoryTest {
 
     public static final int  MAX_FAILED_LOGIN_ATTEMPTS = Constants.MAX_FAILED_LOGIN_ATTEMPTS;
 
@@ -76,7 +74,7 @@ public class UserloginRepositoryTester  {
             //Assert.isTrue(count > 0, "Failed to save login");
             Assert.isTrue(userloginRepository.reachedMaxFailedLogonAttempts(login.getEmail(),MAX_FAILED_LOGIN_ATTEMPTS), "Unexpected false that userLogin excceeded maximum login attempts");
             Userlogin login2 = userloginRepository.getById(login.getId());
-            System.out.printf("Stop");
+            System.out.println("Stop");
 
         } catch(Exception e) {
             e.printStackTrace(System.err);

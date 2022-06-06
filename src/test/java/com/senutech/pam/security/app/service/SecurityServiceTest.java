@@ -1,11 +1,8 @@
-package com.senutech.pam.app.service;
+package com.senutech.pam.security.app.service;
 
 import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.model.containers.AccountCreateRequest;
 import com.senutech.pam.security.app.model.containers.AccountCreateResult;
-import com.senutech.pam.security.app.service.SecurityService;
-import org.assertj.core.data.Offset;
-import org.checkerframework.checker.fenum.qual.SwingTextOrientation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +11,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes= SecurityApp.class)
-public class SecurityServiceTester {
+public class SecurityServiceTest {
 
     @Autowired
     private SecurityService securityService;
@@ -26,6 +22,8 @@ public class SecurityServiceTester {
     @Test
     public void createAccount() {
         try {
+            System.out.printf("server port = %s\n",System.getProperty("server.port"));
+
             ZoneId zone = ZoneId.of("America/New_York");
             OffsetDateTime timestamp = OffsetDateTime.now(zone);
             String verificationUrl = "http://www.cnn.com";
