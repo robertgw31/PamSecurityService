@@ -1,14 +1,26 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
 @Table(name = "stockroomtype")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Stockroomtype {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID id;
 
     @Column(name = "code", nullable = false, length = 100)
@@ -25,53 +37,5 @@ public class Stockroomtype {
 
     @Column(name = "sortorder", nullable = false)
     private Integer sortorder;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getIsolanguage() {
-        return isolanguage;
-    }
-
-    public void setIsolanguage(String isolanguage) {
-        this.isolanguage = isolanguage;
-    }
-
-    public String getFriendlyname() {
-        return friendlyname;
-    }
-
-    public void setFriendlyname(String friendlyname) {
-        this.friendlyname = friendlyname;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public Integer getSortorder() {
-        return sortorder;
-    }
-
-    public void setSortorder(Integer sortorder) {
-        this.sortorder = sortorder;
-    }
 
 }

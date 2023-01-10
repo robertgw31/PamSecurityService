@@ -18,11 +18,6 @@ import java.time.format.DateTimeFormatter;
 @Configuration
 public class JacksonOffsetDateTimeMapper{
 
-    // replaces DateTimeFormatter.ISO_ZONED_DATE_TIME
-    // Shouldbe using ISO 8601
-    private static final DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnn'Z'");
-    private static final DateTimeFormatter is8601Formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-
     @Primary
     @Bean
     public ObjectMapper objectMapper() {
@@ -35,14 +30,14 @@ public class JacksonOffsetDateTimeMapper{
         simpleModule.addSerializer(OffsetDateTime.class, new JsonSerializer<OffsetDateTime>() {
             @Override
             public void serialize(OffsetDateTime offsetDateTime, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-                jsonGenerator.writeString(is8601Formatter.format(offsetDateTime));
+                jsonGenerator.writeString(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(offsetDateTime));
             }
         });
         simpleModule.addDeserializer(OffsetDateTime.class, new JsonDeserializer<OffsetDateTime>() {
 
             @Override
             public OffsetDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
-                return OffsetDateTime.parse(jsonParser.getText(), is8601Formatter);
+                return OffsetDateTime.parse(jsonParser.getText(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
             }
          });
         objectMapper.registerModule(simpleModule);

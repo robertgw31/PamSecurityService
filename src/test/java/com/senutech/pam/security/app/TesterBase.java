@@ -1,9 +1,6 @@
 package com.senutech.pam.security.app;
 
-import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.model.domain.Tranaudit;
-import com.senutech.pam.security.app.model.domain.Userlogin;
-import com.senutech.pam.security.app.model.domain.Userrequest;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;

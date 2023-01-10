@@ -1,12 +1,24 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "controls")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Control {
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
     private Integer id;
 
     @Column(name = "envid", nullable = false, length = 50)
@@ -15,51 +27,11 @@ public class Control {
     @Column(name = "envname", nullable = false, length = 200)
     private String envname;
 
-    @Lob
+
     @Column(name = "federationid")
     private String federationid;
 
     @Column(name = "passwordkey")
     private byte[] passwordkey;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getEnvid() {
-        return envid;
-    }
-
-    public void setEnvid(String envid) {
-        this.envid = envid;
-    }
-
-    public String getEnvname() {
-        return envname;
-    }
-
-    public void setEnvname(String envname) {
-        this.envname = envname;
-    }
-
-    public String getFederationid() {
-        return federationid;
-    }
-
-    public void setFederationid(String federationid) {
-        this.federationid = federationid;
-    }
-
-    public byte[] getPasswordkey() {
-        return passwordkey;
-    }
-
-    public void setPasswordkey(byte[] passwordkey) {
-        this.passwordkey = passwordkey;
-    }
 
 }

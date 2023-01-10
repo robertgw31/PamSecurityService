@@ -1,4 +1,4 @@
-package com.senutech.pam.security.app.model.containers;
+package com.senutech.pam.security.app.model.container;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
@@ -29,13 +27,14 @@ public class AccountCreateRequest {
     private String loginPassword;
     private String loginAuthProvider;
     private String loginImageURL;
+    private String  emailVerificationUrl;
 
 
     // these at the application boundry
     private String clientMachine;
 
     private OffsetDateTime requestRecieptTime;
-    private String EmailVerificationUrlRoot;
+
 
     // these are set within the service
     private UUID id;

@@ -1,8 +1,8 @@
 package com.senutech.pam.security.app.service;
 
 import com.senutech.pam.security.app.SecurityApp;
-import com.senutech.pam.security.app.model.containers.AccountCreateRequest;
-import com.senutech.pam.security.app.model.containers.AccountCreateResult;
+import com.senutech.pam.security.app.model.container.AccountCreateRequest;
+import com.senutech.pam.security.app.model.container.AccountCreateResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class SecurityServiceTest {
             request.setRequestRecieptTime(timestamp);
             request.setClientMachine("10.10.10.1");
             request.setUserLocalDateTime(timestamp);
-            request.setEmailVerificationUrlRoot(verificationUrl);
+            request.setEmailVerificationUrl("https://pam.com?e=robertw@senutech.com&t=xxxx");
             AccountCreateResult res = securityService.createAccount(request);
 
         } catch(Exception e) {

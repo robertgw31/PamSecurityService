@@ -1,8 +1,6 @@
 package com.senutech.pam.security.app.repository;
 
 import com.senutech.pam.security.app.model.domain.Userlogin;
-import com.senutech.pam.security.app.util.Constants;
-import com.senutech.pam.security.app.util.UserLoginStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Repository
-public interface UserloginRepository extends JpaRepository<Userlogin, UUID> {
+public interface  UserloginRepository extends JpaRepository<Userlogin, UUID> {
 
     //
 

@@ -1,43 +1,30 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "supportedlang")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Supportedlang {
     @Id
-    @Column(name = "isolanguage", nullable = false, length = 20)
-    private String id;
+    @Column(name = "isolanguage", length = 20, nullable = false, updatable = false)
+    private String isoLanguage;
 
     @Column(name = "iconcls", length = 100)
     private String iconcls;
 
-    @Lob
     @Column(name = "thevalue", nullable = false)
     private String thevalue;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getIconcls() {
-        return iconcls;
-    }
-
-    public void setIconcls(String iconcls) {
-        this.iconcls = iconcls;
-    }
-
-    public String getThevalue() {
-        return thevalue;
-    }
-
-    public void setThevalue(String thevalue) {
-        this.thevalue = thevalue;
-    }
 
 }

@@ -1,21 +1,35 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "usersession")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Usersession {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID id;
 
     @Column(name = "accountid", nullable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID accountid;
 
     @Column(name = "userloginid", nullable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID userloginid;
 
     @Column(name = "clientmachine", length = 200)
@@ -35,77 +49,5 @@ public class Usersession {
 
     @Column(name = "wastimedout", nullable = false)
     private Boolean wastimedout = false;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public UUID getAccountid() {
-        return accountid;
-    }
-
-    public void setAccountid(UUID accountid) {
-        this.accountid = accountid;
-    }
-
-    public UUID getUserloginid() {
-        return userloginid;
-    }
-
-    public void setUserloginid(UUID userloginid) {
-        this.userloginid = userloginid;
-    }
-
-    public String getClientmachine() {
-        return clientmachine;
-    }
-
-    public void setClientmachine(String clientmachine) {
-        this.clientmachine = clientmachine;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public OffsetDateTime getStarttime() {
-        return starttime;
-    }
-
-    public void setStarttime(OffsetDateTime starttime) {
-        this.starttime = starttime;
-    }
-
-    public OffsetDateTime getEndtime() {
-        return endtime;
-    }
-
-    public void setEndtime(OffsetDateTime endtime) {
-        this.endtime = endtime;
-    }
-
-    public Boolean getIsactive() {
-        return isactive;
-    }
-
-    public void setIsactive(Boolean isactive) {
-        this.isactive = isactive;
-    }
-
-    public Boolean getWastimedout() {
-        return wastimedout;
-    }
-
-    public void setWastimedout(Boolean wastimedout) {
-        this.wastimedout = wastimedout;
-    }
 
 }

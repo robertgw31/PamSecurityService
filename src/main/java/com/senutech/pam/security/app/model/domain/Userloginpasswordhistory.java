@@ -1,15 +1,27 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "userloginpasswordhistory")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Userloginpasswordhistory {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID id;
 
     @Column(name = "notes", length = 4000)
@@ -23,15 +35,19 @@ public class Userloginpasswordhistory {
     private Long recversion;
 
     @Column(name = "createtranauditid", nullable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID createtranauditid;
 
     @Column(name = "updatetranauditid", nullable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID updatetranauditid;
 
     @Column(name = "accountid", nullable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID accountid;
 
     @Column(name = "userloginid", nullable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID userloginid;
 
     @Column(name = "loginpassword", nullable = false, length = 100)
@@ -51,117 +67,5 @@ public class Userloginpasswordhistory {
 
     @Column(name = "verificationtimestamp")
     private OffsetDateTime verificationtimestamp;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public Integer getSortorder() {
-        return sortorder;
-    }
-
-    public void setSortorder(Integer sortorder) {
-        this.sortorder = sortorder;
-    }
-
-    public Long getRecversion() {
-        return recversion;
-    }
-
-    public void setRecversion(Long recversion) {
-        this.recversion = recversion;
-    }
-
-    public UUID getCreatetranauditid() {
-        return createtranauditid;
-    }
-
-    public void setCreatetranauditid(UUID createtranauditid) {
-        this.createtranauditid = createtranauditid;
-    }
-
-    public UUID getUpdatetranauditid() {
-        return updatetranauditid;
-    }
-
-    public void setUpdatetranauditid(UUID updatetranauditid) {
-        this.updatetranauditid = updatetranauditid;
-    }
-
-    public UUID getAccountid() {
-        return accountid;
-    }
-
-    public void setAccountid(UUID accountid) {
-        this.accountid = accountid;
-    }
-
-    public UUID getUserloginid() {
-        return userloginid;
-    }
-
-    public void setUserloginid(UUID userloginid) {
-        this.userloginid = userloginid;
-    }
-
-    public String getLoginpassword() {
-        return loginpassword;
-    }
-
-    public void setLoginpassword(String loginpassword) {
-        this.loginpassword = loginpassword;
-    }
-
-    public Boolean getIscurrent() {
-        return iscurrent;
-    }
-
-    public void setIscurrent(Boolean iscurrent) {
-        this.iscurrent = iscurrent;
-    }
-
-    public Boolean getIsverified() {
-        return isverified;
-    }
-
-    public void setIsverified(Boolean isverified) {
-        this.isverified = isverified;
-    }
-
-    public String getVerificationcode() {
-        return verificationcode;
-    }
-
-    public void setVerificationcode(String verificationcode) {
-        this.verificationcode = verificationcode;
-    }
-
-    public OffsetDateTime getReplacementtimestamp() {
-        return replacementtimestamp;
-    }
-
-    public void setReplacementtimestamp(OffsetDateTime replacementtimestamp) {
-        this.replacementtimestamp = replacementtimestamp;
-    }
-
-    public OffsetDateTime getVerificationtimestamp() {
-        return verificationtimestamp;
-    }
-
-    public void setVerificationtimestamp(OffsetDateTime verificationtimestamp) {
-        this.verificationtimestamp = verificationtimestamp;
-    }
 
 }

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="JpaBuddyIdeaProjectConfig">
     <option name="defaultUnitInitialized" value="true" />
+    <option name="renamerInitialized" value="true" />
     <option name="reverseEngineeringLastDbConnectionId" value="82685cba-0a96-4765-8f8a-720ec6df70cb" />
     <option name="reLastEntityCreationPackage" value="src/main/java/com/senutech/pam/security/app/model/domain" />
   </component>

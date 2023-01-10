@@ -1,4 +1,4 @@
-package com.senutech.pam.security.app.model.containers;
+package com.senutech.pam.security.app.model.container;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

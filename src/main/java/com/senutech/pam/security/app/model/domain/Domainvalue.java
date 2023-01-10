@@ -1,15 +1,27 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "domainvalue")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Domainvalue {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID id;
 
     @Column(name = "createtime", nullable = false)
@@ -32,69 +44,5 @@ public class Domainvalue {
 
     @Column(name = "notes", length = 1000)
     private String notes;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public OffsetDateTime getCreatetime() {
-        return createtime;
-    }
-
-    public void setCreatetime(OffsetDateTime createtime) {
-        this.createtime = createtime;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public String getIsolanguage() {
-        return isolanguage;
-    }
-
-    public void setIsolanguage(String isolanguage) {
-        this.isolanguage = isolanguage;
-    }
-
-    public String getIsolanguagetag() {
-        return isolanguagetag;
-    }
-
-    public void setIsolanguagetag(String isolanguagetag) {
-        this.isolanguagetag = isolanguagetag;
-    }
-
-    public String getK() {
-        return k;
-    }
-
-    public void setK(String k) {
-        this.k = k;
-    }
-
-    public String getV() {
-        return v;
-    }
-
-    public void setV(String v) {
-        this.v = v;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
 
 }

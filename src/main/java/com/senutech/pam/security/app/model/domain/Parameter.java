@@ -1,14 +1,26 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
 @Table(name = "parameter")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Parameter {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID id;
 
     @Column(name = "environment", nullable = false, length = 50)
@@ -20,48 +32,8 @@ public class Parameter {
     @Column(name = "friendlyname", nullable = false, length = 200)
     private String friendlyname;
 
-    @Lob
+
     @Column(name = "thevalue", nullable = false)
     private String thevalue;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getEnvironment() {
-        return environment;
-    }
-
-    public void setEnvironment(String environment) {
-        this.environment = environment;
-    }
-
-    public String getJavatype() {
-        return javatype;
-    }
-
-    public void setJavatype(String javatype) {
-        this.javatype = javatype;
-    }
-
-    public String getFriendlyname() {
-        return friendlyname;
-    }
-
-    public void setFriendlyname(String friendlyname) {
-        this.friendlyname = friendlyname;
-    }
-
-    public String getThevalue() {
-        return thevalue;
-    }
-
-    public void setThevalue(String thevalue) {
-        this.thevalue = thevalue;
-    }
 
 }

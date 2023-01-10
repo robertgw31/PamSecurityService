@@ -1,14 +1,15 @@
 package com.senutech.pam.security.app.controller;
 
 import com.senutech.pam.security.app.exception.PamException;
-import com.senutech.pam.security.app.model.containers.AccountCreateClientResult;
-import com.senutech.pam.security.app.model.containers.AccountCreateRequest;
-import com.senutech.pam.security.app.model.containers.AccountCreateResult;
-import com.senutech.pam.security.app.model.domain.Account;
+import com.senutech.pam.security.app.model.container.AccountCreateClientResult;
+import com.senutech.pam.security.app.model.container.AccountCreateRequest;
+import com.senutech.pam.security.app.model.container.AccountCreateResult;
+import com.senutech.pam.security.app.model.container.ResultBase;
 import com.senutech.pam.security.app.model.domain.Userlogin;
 import com.senutech.pam.security.app.repository.UserloginRepository;
 import com.senutech.pam.security.app.service.SecurityService;
 
+import com.senutech.pam.security.app.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 public class SecurityController {
@@ -40,11 +40,10 @@ public class SecurityController {
                 remoteMachine = remoteAddr;
 
             OffsetDateTime timestamp = OffsetDateTime.now(ZoneOffset.UTC);
-            String emailVerificationURLRoot = "http://localhost/s/emailverification/";
+
 
             accountCreateRequest.setClientMachine(remoteMachine);
             accountCreateRequest.setRequestRecieptTime(timestamp);
-            accountCreateRequest.setEmailVerificationUrlRoot(emailVerificationURLRoot);
             AccountCreateResult fullResult = securityService.createAccount(accountCreateRequest);
             return new AccountCreateClientResult(fullResult);
         } catch(Exception e) {
@@ -52,7 +51,16 @@ public class SecurityController {
         }
     }
 
-    public void verifyEmail(HttpServletRequest httpRequest) {
+    public ResultBase verifyEmail(HttpServletRequest httpRequest) throws PamException {
+        try {
+            String e = httpRequest.getParameter("e");
+            String t = httpRequest.getParameter("t");
+
+            securityService.validateUserLoginEmail(e,t);
+            return new ResultBase();
+        } catch(Exception e) {
+            throw PamException.normalize("verifyEmail REST method failure", e);
+        }
 
     }
 

@@ -1,15 +1,27 @@
 package com.senutech.pam.security.app.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "worktable")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Worktable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID id;
 
     @Column(name = "createtime", nullable = false)
@@ -23,45 +35,5 @@ public class Worktable {
 
     @Column(name = "tablerowid", nullable = false)
     private UUID tablerowid;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public OffsetDateTime getCreatetime() {
-        return createtime;
-    }
-
-    public void setCreatetime(OffsetDateTime createtime) {
-        this.createtime = createtime;
-    }
-
-    public String getTablename() {
-        return tablename;
-    }
-
-    public void setTablename(String tablename) {
-        this.tablename = tablename;
-    }
-
-    public UUID getBatchid() {
-        return batchid;
-    }
-
-    public void setBatchid(UUID batchid) {
-        this.batchid = batchid;
-    }
-
-    public UUID getTablerowid() {
-        return tablerowid;
-    }
-
-    public void setTablerowid(UUID tablerowid) {
-        this.tablerowid = tablerowid;
-    }
 
 }

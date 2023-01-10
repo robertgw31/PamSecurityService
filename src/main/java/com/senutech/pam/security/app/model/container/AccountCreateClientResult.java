@@ -1,9 +1,7 @@
-package com.senutech.pam.security.app.model.containers;
+package com.senutech.pam.security.app.model.container;
 
 import com.senutech.pam.security.app.controller.response.ApiResponseBase;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;

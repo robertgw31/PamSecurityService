@@ -1,6 +1,6 @@
-package com.senutech.pam.security.app.model.containers;
+package com.senutech.pam.security.app.model.container;
 
-import com.senutech.pam.security.app.model.domain.*;
+
 import com.senutech.pam.security.app.model.domain.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

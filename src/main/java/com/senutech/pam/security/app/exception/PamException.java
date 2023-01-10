@@ -70,6 +70,7 @@ public class PamException extends Exception {
         logger.error(msg,ex);
     }
 
+
     public static PamException normalize(String message, Throwable ex) {
         PamException pe;
         if(ex instanceof PamException) {
