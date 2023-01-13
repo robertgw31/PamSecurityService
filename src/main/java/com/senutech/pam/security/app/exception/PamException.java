@@ -73,7 +73,9 @@ public class PamException extends Exception {
 
     public static PamException normalize(String message, Throwable ex) {
         PamException pe;
-        if(ex instanceof PamException) {
+        if (ex == null) {
+            return new PamException(message);
+        } else if(ex instanceof PamException) {
             pe = (PamException) ex;
         } else {
             String newMessage = String.format("%s - %s",message, ex.getMessage());
@@ -83,7 +85,9 @@ public class PamException extends Exception {
     }
     public static PamException normalize(String message, Object context, Throwable ex) {
         PamException pe;
-        if(ex instanceof PamException) {
+        if (ex == null) {
+            return new PamException(message, context);
+        } else if(ex instanceof PamException) {
             pe = (PamException) ex;
         } else {
             pe = new PamException(message,context,ex);

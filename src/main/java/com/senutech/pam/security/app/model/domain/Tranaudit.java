@@ -10,14 +10,13 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-
+//@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "tranaudit")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Tranaudit {
     @Id
     @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)

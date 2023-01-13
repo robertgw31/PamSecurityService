@@ -46,7 +46,7 @@ public class SecurityService {
 
     public static final int MAX_MINUTES_FOR_EMAIL_VERIFICATION = Constants.MAX_MINUTES_FOR_EMAIL_VERIFICATION;
 
-    private static String ENCRYPTION_KEY = KeyGenerators.string().generateKey();
+    private static String ENCRYPTION_KEY = "ABCABC";
     private static String ENCRYPTION_PASSWORD = "Max";
     private TextEncryptor encryptor = Encryptors.text(ENCRYPTION_PASSWORD,ENCRYPTION_KEY);
 
@@ -192,7 +192,7 @@ public class SecurityService {
             login.setAccountid(id);
             login.setFullname(request.getLoginFullName());
             login.setEmail(request.getLoginEmail());
-           // login.setEmailVerificationToken(t);
+            login.setEmailVerificationToken(token);
             login.setImageurl(request.getLoginImageURL());
             login.setLastaccesstimestamp(timestamp);
             login.setFailedloginattempts(0);
@@ -272,16 +272,21 @@ public class SecurityService {
             throw PamException.normalize("t parameter missing",null);
         }
         UUID id = UUID.randomUUID();
+        String email = "";
+        String token = "";
         OffsetDateTime  nowTimestamp = OffsetDateTime.now(ZoneOffset.UTC);
-        String email = encryptor.decrypt(e);
-        String token = encryptor.decrypt(t);
+        try {
+            email = encryptor.decrypt(e);
+            token = encryptor.decrypt(t);
+        } catch(Exception ex) {
+            throw PamException.normalize("Failure to interpret parametesr",ex);
+        }
         Userlogin userlogin = userloginRepository.findByEmailNotClosed(email);
         if(userlogin == null) {
             throw PamException.normalize("An activation was attempted for an unkknown email",null);
         }
-        if (!Constants.WEB_APP_PATH_EMAIL_VERIFICTION.equals(userlogin.getStatus())) {
-            // we treat this as a no-op
-            return;
+        if (!Constants.USER_LOGON_STATUS_PENDING_EMAIL_VERIFCATION.equals(userlogin.getStatus())) {
+            throw PamException.normalize("The user account is not pending activation",null);
         }
         String dbToken = userlogin.getEmailVerificationToken();
         if (dbToken == null || !dbToken.equals(token)) {
@@ -301,6 +306,7 @@ public class SecurityService {
         transaudit.setAudittimestamp(nowTimestamp);
         transaudit.setUserloginid(userlogin.getId());
         userlogin.setEmailVerificationToken(null);
+        userlogin.setEmailverified(true);
         userlogin.setStatus(Constants.USER_LOGON_STATUS_ACTIVE);
         userlogin.setStatustimestamp(nowTimestamp);
         userlogin.setUpdatetranauditid(transaudit.getId());

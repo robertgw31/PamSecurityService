@@ -8,8 +8,6 @@ import java.util.UUID;
 
 @Getter
 @Setter
-
-
 public class AccountCreateClientResult extends ApiResponseBase {
     private UUID accountId;
     private UUID userId;

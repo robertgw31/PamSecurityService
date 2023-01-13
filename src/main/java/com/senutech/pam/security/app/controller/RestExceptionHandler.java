@@ -2,6 +2,8 @@ package com.senutech.pam.security.app.controller;
 
 import com.senutech.pam.security.app.controller.response.ApiErrorResponse;
 import com.senutech.pam.security.app.exception.PamException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -17,11 +19,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static Logger logger = LoggerFactory.getLogger(RestExceptionHandler.class);
+
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String error = "Malformed JSON request";
-        return buildResponseEntity(new ApiErrorResponse(HttpStatus.BAD_REQUEST, error, ex));
+        String errorMessage = "Malformed JSON request";
+        logger.error(errorMessage);
+        return buildResponseEntity(new ApiErrorResponse(HttpStatus.BAD_REQUEST, errorMessage, ex));
     }
 
     //other exception handlers
@@ -33,6 +38,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiErrorResponse errorResponse) {
-        return new ResponseEntity<>(errorResponse, errorResponse.getStatus());
+        HttpStatus status = errorResponse.getStatus();
+        return new ResponseEntity<>(errorResponse, status);
     }
 }

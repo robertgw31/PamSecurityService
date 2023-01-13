@@ -7,8 +7,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="PamSecurityService" />
         <module name="pam-security-app" />
+      </profile>
+      <profile name="Annotation profile for pam-security-app" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.22/lombok-1.18.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/2.0.4.RELEASE/spring-boot-configuration-processor-2.0.4.RELEASE.jar" />
+        </processorPath>
+        <module name="PamSecurityService" />
       </profile>
     </annotationProcessing>
   </component>
