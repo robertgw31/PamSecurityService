@@ -1,4 +1,4 @@
-package com.senutech.pam.security.app.controller.response;
+package com.senutech.pam.security.app.model.container;
 
 import lombok.Getter;
 import lombok.Setter;

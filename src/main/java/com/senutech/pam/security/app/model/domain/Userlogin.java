@@ -31,7 +31,7 @@ public class Userlogin {
     private Integer sortorder;
 
     @Column(name = "recversion", nullable = false)
-    @Version
+    //@Version
     private Long recversion;
 
     @Column(name = "createtranauditid", nullable = false)
@@ -46,6 +46,9 @@ public class Userlogin {
     @Type(type="org.hibernate.type.PostgresUUIDType")
     private UUID accountid;
 
+    @Column(name="nickname")
+    private String nickname;
+
     @Column(name = "fullname", length = 200)
     private String fullname;
 
@@ -55,8 +58,14 @@ public class Userlogin {
     @Column(name = "authprovider", length = 100)
     private String authprovider;
 
-    @Column(name = "authproviderid", length = 200)
-    private String authproviderid;
+    @Column(name = "authproviderconnection", length = 200)
+    private String authProviderConnection;
+
+    @Column(name = "issocial")
+    private boolean isSocial;
+
+    @Column(name = "authprovideruserid", length = 200)
+    private String authProviderUserId;
 
     @Column(name = "imageurl", length = 200)
     private String imageurl;

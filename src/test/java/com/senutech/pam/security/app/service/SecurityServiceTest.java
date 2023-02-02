@@ -3,6 +3,8 @@ package com.senutech.pam.security.app.service;
 import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.model.container.AccountCreateRequest;
 import com.senutech.pam.security.app.model.container.AccountCreateResult;
+import com.senutech.pam.security.app.model.container.VerifyEmailRequest;
+import com.senutech.pam.security.app.model.container.VerifyEmailResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,7 @@ public class SecurityServiceTest {
     private SecurityService securityService;
 
     @Test
-    public void createAccount() {
+    public void createAccount() throws Exception {
         try {
             System.out.printf("server port = %s\n",System.getProperty("server.port"));
 
@@ -45,6 +47,45 @@ public class SecurityServiceTest {
 
         } catch(Exception e) {
             e.printStackTrace(System.err);
+            throw e;
+        }
+    }
+
+    @Test
+    public void testValidateUserLoginEmail() throws Exception {
+        try {
+            VerifyEmailRequest req = new VerifyEmailRequest();
+            req.setT("XXXXX");
+
+            boolean success = true;
+            String testEmail = "";
+            VerifyEmailResponse res = null;
+
+            testEmail = "robertgw31@gmail.com";
+            req.setE(testEmail);
+            res = securityService.validateUserLoginEmail(req);
+            success = (res.isExists() == false);
+            System.out.println(String.format("Validation of email for '%s' was %s -- account %s exist and/or %s active",
+                    testEmail,
+                    success,
+                    (res.isExists() ? "DOES" : "DOES NOT"),
+                    (res.isExists() ? "IS" : "IS NOT")
+                    ));
+
+            testEmail = "robertw@senutech.com";
+            req.setE(testEmail);
+            res = securityService.validateUserLoginEmail(req);
+            success = (res.isExists() == true);
+            System.out.println(String.format("Validation of email for '%s' was %s -- account %s exist and/or %s active",
+                    testEmail,
+                    success,
+                    (res.isExists() ? "DOES" : "DOES NOT"),
+                    (res.isExists() ? "IS" : "IS NOT")
+            ));
+
+        } catch(Exception e) {
+            e.printStackTrace(System.err);
+            throw e;
         }
     }
 

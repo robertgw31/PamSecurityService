@@ -28,6 +28,9 @@ public interface  UserloginRepository extends JpaRepository<Userlogin, UUID> {
     @Query("select p from Userlogin p where p.email = :LoginEmail and p.isclosed = false")
     Userlogin findByEmailNotClosed(@Param("LoginEmail") String email );
 
+    @Query("select p from Userlogin p where p.email = :LoginEmail and p.isclosed = false and p.status = 'ACTIVE'")
+    Userlogin findByEmailActive(@Param("LoginEmail") String email );
+
     @Query("SELECT CASE WHEN p.failedloginattempts > :maxLogonAttempts then true else false end from Userlogin p where p.email = :loginEmail and p.isclosed = false")
     boolean reachedMaxFailedLogonAttempts(@Param("loginEmail") String logonEmail, @Param("maxLogonAttempts") int maxLogonAttemmpts);
 

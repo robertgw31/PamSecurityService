@@ -1,7 +1,5 @@
-package com.senutech.pam.security.app.controller.response;
+package com.senutech.pam.security.app.model.container;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.senutech.pam.security.app.exception.ExceptionDetail;
 import com.senutech.pam.security.app.exception.PamException;
 import com.senutech.pam.security.app.exception.ValidationError;
 import lombok.Getter;
@@ -11,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Getter

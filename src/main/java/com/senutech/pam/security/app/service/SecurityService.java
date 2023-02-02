@@ -2,33 +2,36 @@ package com.senutech.pam.security.app.service;
 
 import com.senutech.pam.security.app.exception.PamException;
 import com.senutech.pam.security.app.exception.ValidationError;
-import com.senutech.pam.security.app.model.container.AccountCreateRequest;
-import com.senutech.pam.security.app.model.container.AccountCreateResult;
+import com.senutech.pam.security.app.model.auth0.Auth0User;
+import com.senutech.pam.security.app.model.auth0.Auth0UserIdentity;
+import com.senutech.pam.security.app.model.auth0.GeoIp;
+import com.senutech.pam.security.app.model.container.*;
 import com.senutech.pam.security.app.model.domain.*;
 import com.senutech.pam.security.app.repository.*;
 import com.senutech.pam.security.app.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.encrypt.Encryptors;
-import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 
 import javax.transaction.Transactional;
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
+
+import org.apache.commons.text.WordUtils;
 
 @Service
 public class SecurityService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private Auth0Service auth0Service;
 
     @Autowired
     private UserloginRepository userloginRepository;
@@ -41,10 +44,10 @@ public class SecurityService {
     @Autowired
     private AccountRepository accountRepository;
 
-    public static final int  MAX_FAILED_LOGIN_ATTEMPTS = Constants.MAX_FAILED_LOGIN_ATTEMPTS;
+    public static final int  MAX_FAILED_LOGIN_ATTEMPTS = PamConstants.MAX_FAILED_LOGIN_ATTEMPTS;
     public static final String ACTIVE = UserLoginStatus.ACTIVE.toString();
 
-    public static final int MAX_MINUTES_FOR_EMAIL_VERIFICATION = Constants.MAX_MINUTES_FOR_EMAIL_VERIFICATION;
+    public static final int MAX_MINUTES_FOR_EMAIL_VERIFICATION = PamConstants.MAX_MINUTES_FOR_EMAIL_VERIFICATION;
 
     private static String ENCRYPTION_KEY = "ABCABC";
     private static String ENCRYPTION_PASSWORD = "Max";
@@ -58,7 +61,7 @@ public class SecurityService {
         tranaudit.setAudittimestamp(OffsetDateTime.now(ZoneOffset.UTC));
         tranaudit.setUserloginid(userLoginId);
         try {
-            tranauditRepository.save(tranaudit);
+            tranauditRepository.saveAndFlush(tranaudit);
         } catch(Exception e) {
             throw PamException.normalize("Could not save Tranaudit record",tranaudit,e);
         }
@@ -72,7 +75,7 @@ public class SecurityService {
         tranaudit.setAudittimestamp(OffsetDateTime.now(ZoneOffset.UTC));
         tranaudit.setLoginrequestid(userRequestId);
         try {
-            tranauditRepository.save(tranaudit);
+            tranauditRepository.saveAndFlush(tranaudit);
         } catch(Exception e) {
             throw PamException.normalize("Could not save Tranaudit record",tranaudit,e);
         }
@@ -88,7 +91,7 @@ public class SecurityService {
         usersession.setNotes(notes);
         usersession.setStarttime(OffsetDateTime.now(ZoneOffset.UTC));
         try {
-            usersessionRepository.save(usersession);
+            usersessionRepository.saveAndFlush(usersession);
         } catch(Exception e) {
             String message = String.format("Could not save userSession record for UserLoginid: %s",userLoginID.toString());
             throw PamException.normalize(message,usersession,e);
@@ -161,6 +164,14 @@ public class SecurityService {
             if (userloginRepository.existsByEmail(request.getLoginEmail()))
                 throw new PamException("Duplicate user creation attempt", String.format("A account user with email '%s' already exists", request.getLoginEmail()));
 
+            // go to auth0 to get additional information
+            Auth0User auth0User = auth0Service.getUserByEmail(request.getLoginEmail());
+            Auth0UserIdentity auth0UserIdentity = auth0User.getIdentities().get(0);
+            GeoIp geoIp = null;
+            if (auth0User.getMetaData() != null && auth0User.getMetaData().getGeoIp() != null) {
+                geoIp = auth0User.getMetaData().getGeoIp();
+            }
+
 
             UUID id = UUID.randomUUID();
             OffsetDateTime timestamp = OffsetDateTime.now(ZoneOffset.UTC);
@@ -185,24 +196,29 @@ public class SecurityService {
             Userlogin login = new Userlogin();
             login.setId(id);
             login.setAccountid(id);
-            login.setAuthprovider(request.getLoginAuthProvider());
-            login.setAuthproviderid(request.getLoginAuthProvider());
+            login.setAuthprovider(auth0UserIdentity.getProvider());
+            login.setAuthProviderConnection(auth0UserIdentity.getConnection());
+            login.setSocial(auth0UserIdentity.isSocial());
+            login.setAuthProviderUserId(auth0User.getUserId());
             login.setCreatetranauditid(id);
             login.setUpdatetranauditid(id);
             login.setAccountid(id);
             login.setFullname(request.getLoginFullName());
             login.setEmail(request.getLoginEmail());
             login.setEmailVerificationToken(token);
+            login.setEmailverified(true);
             login.setImageurl(request.getLoginImageURL());
             login.setLastaccesstimestamp(timestamp);
             login.setFailedloginattempts(0);
             login.setNotes("Account owner");
-            login.setStatus(UserLoginStatus.PENDING_EMAIL_VERIFICATION.toString());
+            login.setStatus(UserLoginStatus.ACTIVE.toString());
             login.setStatustimestamp(timestamp);
             login.setRecversion(1L);
             login.setSortorder(1);
             login.setIsolanguage("en" );
-            login.setIsocountrycode("us");
+            if (geoIp != null) {
+                login.setIsocountrycode(geoIp.getContinentCode());
+            }
 
             Usersession usersession = new Usersession();
             usersession.setId(id);
@@ -235,17 +251,17 @@ public class SecurityService {
             account.setIsolanguage(request.getIsoLanguage());
             account.setOpendate(timestamp);
             account.setOwneruserloginid(id);
-            account.setStatus(AccountStatus.PENDING_ACTIVATION.toString());
+            account.setStatus(AccountStatus.ACTIVE.toString());
             account.setStatustimestamp(timestamp);
             account.setIsclosed(false);
             account.setRecversion(1L);
             account.setSortorder(1);
             try {
-                tranauditRepository.save(tranaudit);
-                usersessionRepository.save(usersession);
-                userrequestRepository.save(userrequest);
-                userloginRepository.save(login);
-                accountRepository.save(account);
+                tranauditRepository.saveAndFlush(tranaudit);
+                usersessionRepository.saveAndFlush(usersession);
+                userrequestRepository.saveAndFlush(userrequest);
+                userloginRepository.saveAndFlush(login);
+                accountRepository.saveAndFlush(account);
 
                 emailService.sendEmailConfirmationMessage(login.getFullname(), login.getEmail(), verificationUrl);
             } catch (Exception ex) {
@@ -263,60 +279,135 @@ public class SecurityService {
             throw PamException.normalize(String.format("Exception creating account: %s",e.getMessage()),e);
         }
     }
+    @Transactional
+    public VerifyEmailResponse validateUserLoginEmail(VerifyEmailRequest request) throws PamException {
+        if(request == null || request.getE() == null || request.getT() == null) {
+            throw PamException.normalize("Parameter missing",null);
+        }
 
-    public void validateUserLoginEmail(String e, String t) throws PamException {
-        if (e == null) {
-            throw PamException.normalize("'e' paramter missing",null);
-        }
-        if (t == null) {
-            throw PamException.normalize("t parameter missing",null);
-        }
-        UUID id = UUID.randomUUID();
-        String email = "";
-        String token = "";
-        OffsetDateTime  nowTimestamp = OffsetDateTime.now(ZoneOffset.UTC);
-        try {
-            email = encryptor.decrypt(e);
-            token = encryptor.decrypt(t);
-        } catch(Exception ex) {
-            throw PamException.normalize("Failure to interpret parametesr",ex);
-        }
-        Userlogin userlogin = userloginRepository.findByEmailNotClosed(email);
+        String e = request.getE();
+        VerifyEmailResponse response = new VerifyEmailResponse();
+        Userlogin userlogin = userloginRepository.findByEmailNotClosed(e);
         if(userlogin == null) {
-            throw PamException.normalize("An activation was attempted for an unkknown email",null);
+            response.setExists(false);
+            response.setSuccess(false);
+            response.setMessage(String.format("An account has not yet been set up for email %s",e));
+        } else {
+            response.setSuccess(true);
+            response.setExists(true);
+            response.setMessage(String.format("An account exists for email %s", e));
         }
-        if (!Constants.USER_LOGON_STATUS_PENDING_EMAIL_VERIFCATION.equals(userlogin.getStatus())) {
-            throw PamException.normalize("The user account is not pending activation",null);
-        }
-        String dbToken = userlogin.getEmailVerificationToken();
-        if (dbToken == null || !dbToken.equals(token)) {
-            throw PamException.normalize("t parameter invalid",null);
-        }
-        OffsetDateTime statusTimestamp = userlogin.getStatustimestamp();
-        long minutes = Duration.between(statusTimestamp,nowTimestamp).toMinutes();
-        if (minutes > Constants.MAX_MINUTES_FOR_EMAIL_VERIFICATION) {
-            String message = String.format("Email verification must be completed within %d minutes",minutes);
-            throw PamException.normalize(message,null);
-        }
+        return response;
 
+    }
 
-
-        Tranaudit transaudit = new Tranaudit();
-        transaudit.setId(id);
-        transaudit.setAudittimestamp(nowTimestamp);
-        transaudit.setUserloginid(userlogin.getId());
-        userlogin.setEmailVerificationToken(null);
-        userlogin.setEmailverified(true);
-        userlogin.setStatus(Constants.USER_LOGON_STATUS_ACTIVE);
-        userlogin.setStatustimestamp(nowTimestamp);
-        userlogin.setUpdatetranauditid(transaudit.getId());
+    @Transactional
+    public UserLogonResponse doLoginByEmail(UserLogonRequest request) throws PamException {
         try {
-            tranauditRepository.save(transaudit);
-            userloginRepository.save(userlogin);
+            UUID id = UUID.randomUUID();
+            OffsetDateTime  nowTimestamp = OffsetDateTime.now(ZoneOffset.UTC);
+
+            UserLogonResponse res = new UserLogonResponse();
+
+            if (request.getEmail() == null || !ValidateionUtil.validateEmailAddress(request.getEmail())) {
+                throw PamException.normalize("Invalid email",null);
+            }
+            Userlogin userlogin = userloginRepository.findByEmailNotClosed(request.getEmail());
+
+            if (userlogin == null) {
+                res.setLogonExists(false);
+                return res;
+                // this is a first-time logon so we will create the account
+//                UUID createID = UUID.randomUUID();
+//                String fullName = request.getNickName();
+//                if (request.getGivenName() != null && request.getGivenName().length() > 0
+//                        && request.getFamilyName() != null && request.getFamilyName().length() > 0) {
+//                    fullName = String.format("%s %s",request.getGivenName(), request.getFamilyName());
+//                }
+//
+//                AccountCreateRequest acctCreate = new AccountCreateRequest();
+//                acctCreate.setLoginEmail(request.getEmail());
+//                acctCreate.setOpenDateTime(nowTimestamp);
+//                acctCreate.setClientMachine(request.getClientMachine());
+//                acctCreate.setAccountName(fullName);
+//                acctCreate.setLoginFullName(fullName);
+//                acctCreate.setUserLocalDateTime(OffsetDateTime.now());
+//                acctCreate.setRequestRecieptTime(OffsetDateTime.now());
+//                acctCreate.setTimestamp(nowTimestamp);
+//                acctCreate.setIsoLanguage("en");
+//                acctCreate.setIsoCountry("us");
+//                acctCreate.setLoginAuthProvider("AUTH0");
+//                try {
+//                    AccountCreateResult acctCreateResult = createAccount(acctCreate);
+//                    userlogin = acctCreateResult.getUserlogin();
+//                } catch(Exception xx) {
+//                    throw PamException.normalize(String.format("Could not find a user with email %s", request.getEmail()), null);
+//                }
+            }
+            userlogin = userloginRepository.findByEmailActive(request.getEmail());
+            Tranaudit transaudit = new Tranaudit();
+            transaudit.setId(id);
+            transaudit.setAudittimestamp(nowTimestamp);
+            transaudit.setUserloginid(userlogin.getId());
+
+            Usersession userSession = new Usersession();
+            userSession.setId(id);
+            userSession.setStarttime(nowTimestamp);
+            userSession.setAccountid(userlogin.getAccountid());
+            userSession.setUserloginid(userlogin.getId());
+            userSession.setIsactive(true);
+            userSession.setClientmachine(request.getClientMachine());
+
+
+            Userrequest userRequest = new Userrequest();
+            userRequest.setId(id);
+            userRequest.setUserloginid(userlogin.getId());
+            userRequest.setStarttime(nowTimestamp);
+            userRequest.setAccountid(userlogin.getAccountid());
+            userRequest.setEndtime(nowTimestamp);
+            userRequest.setRequesttype(RequestType.USER_LOGON.toString());
+            userRequest.setUsersessionid(userSession.getId());
+            userRequest.setRequestdetails("User Logon");
+
+            String nickName = request.getNickName();
+            if (nickName != null && !nickName.equals(userlogin.getNickname())) {
+                userlogin.setNickname(nickName);
+            }
+            String givenName = request.getGivenName();
+            String familyName = request.getFamilyName();
+            String fullName = null;
+            if (givenName != null && !givenName.isEmpty()
+            && familyName != null && !familyName.isEmpty()) {
+                fullName = WordUtils.capitalize(String.format("%s %s",givenName,familyName));
+            }
+            if (fullName == null) {
+                fullName = givenName;
+            }
+            if (fullName != null && !fullName.equals(userlogin.getFullname())) {
+                userlogin.setFullname(fullName);
+            }
+            if (fullName == null)
+
+            userlogin.setUpdatetranauditid(transaudit.getId());
+            userlogin.setLastaccesstimestamp(nowTimestamp);
+            userlogin.setUpdatetranauditid(transaudit.getId());
+            try {
+                tranauditRepository.saveAndFlush(transaudit);
+                userrequestRepository.saveAndFlush(userRequest);
+                usersessionRepository.saveAndFlush(userSession);
+                userloginRepository.saveAndFlush(userlogin);
+            } catch (Exception ex) {
+                throw PamException.normalize("Internal error updating user account for email logon", ex);
+            }
+
+            res.setUserLogin(userlogin);
+            res.setSessionId(userSession.getId().toString());
+            res.setAccessToken(request.getAccessToken());
+            return res;
+
         } catch (Exception ex) {
             throw PamException.normalize("Internal error updating user account for email verification", ex);
         }
-
     }
 
 

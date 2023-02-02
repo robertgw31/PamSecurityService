@@ -4,7 +4,7 @@ import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.exception.PamException;
 import com.senutech.pam.security.app.model.domain.Tranaudit;
 import com.senutech.pam.security.app.model.domain.Userlogin;
-import com.senutech.pam.security.app.util.Constants;
+import com.senutech.pam.security.app.util.PamConstants;
 import com.senutech.pam.security.app.util.JsonUtil;
 import com.senutech.pam.security.app.util.UserLoginStatus;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @SpringBootTest(classes= SecurityApp.class)
 public class UserloginRepositoryTest {
 
-    public static final int  MAX_FAILED_LOGIN_ATTEMPTS = Constants.MAX_FAILED_LOGIN_ATTEMPTS;
+    public static final int  MAX_FAILED_LOGIN_ATTEMPTS = PamConstants.MAX_FAILED_LOGIN_ATTEMPTS;
 
     @Autowired
     private UserloginRepository userloginRepository;
@@ -95,12 +95,11 @@ public class UserloginRepositoryTest {
         login.setUpdatetranauditid(tranaudit.getId());
         login.setAccountid(id);
         login.setAuthprovider(null);
-        login.setAuthproviderid(null);
         login.setCreatetranauditid(id);
         login.setUpdatetranauditid(id);
         login.setAccountid(id);
-        login.setFullname("Robert Wittnebert");
-        login.setEmail("robertw@senutech.com");
+        login.setFullname("Max Wittnebert");
+        login.setEmail("maxw@senutech.com");
         login.setImageurl(null);
         login.setLastaccesstimestamp(timestamp);
         login.setFailedloginattempts(0);
@@ -114,6 +113,13 @@ public class UserloginRepositoryTest {
         return login;
     }
 
+    public void updateLogon() {
+        try {
+
+        } catch(Exception e) {
+            e.printStackTrace(System.err);
+        }
+    }
     private Tranaudit createTranauditForUserLogin(UUID userId) {
 
         UUID id = UUID.randomUUID();

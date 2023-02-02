@@ -9,6 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResultBase {
-    private boolean success = true;
+public class UserLogonRequest {
+    String email;
+    boolean emailVerified;
+    String accessToken;
+    String nickName;
+    String givenName;
+    String familyName;
+    String clientMachine;
 }

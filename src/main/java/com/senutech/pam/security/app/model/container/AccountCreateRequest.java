@@ -27,7 +27,7 @@ public class AccountCreateRequest {
     private String loginPassword;
     private String loginAuthProvider;
     private String loginImageURL;
-    private String  emailVerificationUrl;
+    private String emailVerificationUrl;
 
 
     // these at the application boundry

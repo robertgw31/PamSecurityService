@@ -51,6 +51,17 @@
                 </Pins>
               </value>
             </entry>
+            <entry>
+              <key>
+                <RunConfigurationRef>
+                  <option name="icon" value="application.svg)" />
+                  <option name="name" value="Security Service" />
+                </RunConfigurationRef>
+              </key>
+              <value>
+                <Pins />
+              </value>
+            </entry>
           </map>
         </option>
       </PinnedGrepConsolesState>

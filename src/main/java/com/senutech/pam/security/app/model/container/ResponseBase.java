@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerifyEmailResponse {
-    boolean success;
-    boolean exists;
-    String message;
+public class ResponseBase {
+    private boolean success = true;
 }

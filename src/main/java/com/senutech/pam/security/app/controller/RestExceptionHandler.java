@@ -1,6 +1,6 @@
 package com.senutech.pam.security.app.controller;
 
-import com.senutech.pam.security.app.controller.response.ApiErrorResponse;
+import com.senutech.pam.security.app.model.container.ApiErrorResponse;
 import com.senutech.pam.security.app.exception.PamException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,9 +2,7 @@ package com.senutech.pam.security.app.security;
 
 
 
-import com.auth0.AuthenticationController;
-import com.auth0.jwk.JwkProvider;
-import com.auth0.jwk.JwkProviderBuilder;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,12 +30,18 @@ public class SecurityConfig  {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .mvcMatchers("/s").permitAll()
-                .mvcMatchers("/s/private").authenticated()
-                .mvcMatchers("/api/private-scoped").hasAuthority("SCOPE_read:messages")
-                .and().cors()
-                .and().oauth2ResourceServer().jwt();
+
+        http
+                .csrf().disable()
+                .authorizeRequests()
+
+                .antMatchers(HttpMethod.GET,"/s/*").permitAll()
+                .antMatchers(HttpMethod.POST,"/s/createaccount").permitAll()
+//                 .mvcMatchers("/s").permitAll()
+//                .mvcMatchers("//s/createaccount").authenticated()
+//                .mvcMatchers("/api/private-scoped").hasAuthority("SCOPE_read:messages")
+                .and().cors().disable()
+                .oauth2ResourceServer().jwt();
         return http.build();
     }
 

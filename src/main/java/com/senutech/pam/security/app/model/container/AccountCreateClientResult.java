@@ -1,6 +1,5 @@
 package com.senutech.pam.security.app.model.container;
 
-import com.senutech.pam.security.app.controller.response.ApiResponseBase;
 import lombok.Getter;
 import lombok.Setter;
 

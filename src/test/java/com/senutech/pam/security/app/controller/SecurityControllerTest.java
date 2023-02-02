@@ -3,7 +3,7 @@ package com.senutech.pam.security.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senutech.pam.security.app.SecurityApp;
-import com.senutech.pam.security.app.controller.response.ApiErrorResponse;
+import com.senutech.pam.security.app.model.container.ApiErrorResponse;
 import com.senutech.pam.security.app.model.container.AccountCreateClientResult;
 import com.senutech.pam.security.app.model.container.AccountCreateRequest;
 import com.senutech.pam.security.app.model.container.AccountCreateResult;
@@ -155,7 +155,6 @@ public class SecurityControllerTest {
         login.setId(id);
         login.setAccountid(id);
         login.setAuthprovider(request.getLoginAuthProvider());
-        login.setAuthproviderid(request.getLoginAuthProvider());
         login.setCreatetranauditid(id);
         login.setUpdatetranauditid(id);
         login.setAccountid(id);
