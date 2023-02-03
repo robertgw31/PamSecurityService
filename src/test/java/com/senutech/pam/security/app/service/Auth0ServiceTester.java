@@ -3,6 +3,7 @@ package com.senutech.pam.security.app.service;
 import com.senutech.pam.security.app.SecurityApp;
 import com.senutech.pam.security.app.exception.PamException;
 import com.senutech.pam.security.app.model.auth0.Auth0AccessPass;
+import com.senutech.pam.security.app.model.auth0.Auth0ApiResponse;
 import com.senutech.pam.security.app.model.auth0.Auth0User;
 import com.senutech.pam.security.app.util.JsonUtil;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,8 @@ public class Auth0ServiceTester {
             Auth0User unknownUser = auth0Service.getUserByEmail(unknownEmail);
             String strUnknownUser = JsonUtil.objectToPrettyJson(knownUser);
             System.out.println(strUnknownUser);
+
+
             }catch(Exception e) {
                 throw PamException.normalize("testAquireToken failed",e);
             }
@@ -57,10 +60,19 @@ public class Auth0ServiceTester {
             if (user == null) {
                 throw new PamException(String.format("Was not able to retrieve user information for email%s",userEmail));
             }
-            boolean result = auth0Service.resendVerificationEmail(user.getUserId());
-            System.out.printf("Request to resend email verification to user with email '%s' was %s",
+            Auth0ApiResponse result = auth0Service.resendVerificationEmail(user.getUserId());
+            boolean isSuccessful = auth0Service.isOkAsyncJobStatus(result.getStatus());
+            System.out.printf("Request to resend email verification to user with email '%s' was %s\n",
                     user.getEmail(),
-                    (result ? "successful" : "not successful"));
+                    (isSuccessful ? "successful" : "not successful"));
+
+            System.out.println("Will not retrieve the status");
+            String jobId = result.getId();
+            result = auth0Service.getJobStatus(jobId);
+            System.out.printf("The job with id %s currently has a status of %s which is considered %s\n",
+                    jobId,
+                    result.getStatus(),
+                    (isSuccessful ? "successful" : "not successful"));
 
         }catch(Exception e) {
             throw PamException.normalize("testAquireToken failed",e);

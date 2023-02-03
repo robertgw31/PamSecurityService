@@ -51,6 +51,30 @@ public class Auth0Service {
         }
     }
 
+    public Auth0ApiResponse getJobStatus(String jobId) throws PamException {
+        // jobs/{id}
+        try {
+            String accessToken = getAccessToken();
+            final String requestURL = String.format("%s/jobs/%s", MANAGEMENT_API_BASE,jobId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.add("User-Agent", "PAM Security Microservice" );  // value can be whatever
+            headers.setBearerAuth(accessToken);
+            //headers.add("Authorization", "Bearer "+ auth0AccessToken.getAccessToken() );
+            ResponseEntity<Auth0ApiResponse> response = restTemplate.exchange(requestURL,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Auth0ApiResponse.class);
+            Auth0ApiResponse jobstatus = response.getBody();
+            return jobstatus;
+
+        } catch(Exception e) {
+            throw PamException.normalize("Error in getJobStatus",e);
+        }
+
+    }
+
     public Auth0User getUserByEmail(String email) throws PamException {
         try {
             String accessToken = getAccessToken();
@@ -75,7 +99,7 @@ public class Auth0Service {
         }
     }
 
-    public boolean resendVerificationEmail(String auth0UserId) throws PamException {
+    public Auth0ApiResponse resendVerificationEmail(String auth0UserId) throws PamException {
         try {
             String accessToken = getAccessToken();
             final String requestURL = String.format("%s/jobs/verification-email", MANAGEMENT_API_BASE);
@@ -91,10 +115,13 @@ public class Auth0Service {
                     new HttpEntity<Auth0UserId>(userIdStruct,headers),
                     Auth0ApiResponse.class);
             Auth0ApiResponse response = res.getBody();
-            logger.info(String.format("Request to resend verification email to user '%s' resulted in a status of %s",
-                    auth0UserId,response.getStatus()));
+            boolean isSuccesful = isOkAsyncJobStatus(response.getStatus());
+            logger.info(String.format("Request to resend verification email to user '%s' resulted in a status of %s, which is considered %s",
+                    auth0UserId,response.getStatus(),
+                    isSuccesful ? "not a failure" : "a failure"));
             String status = response.getStatus();
-            return isOkAsyncJobStatus(status);
+
+            return response;
 
         } catch(Exception e) {
             throw PamException.normalize("Error in resendVerificationEmail",e);
@@ -122,7 +149,7 @@ public class Auth0Service {
         }
     }
 
-    private boolean isOkAsyncJobStatus(String status) {
+    public boolean isOkAsyncJobStatus(String status) {
         if(PamConstants.AUTH0_API_OP_STATUS_COMPLETED.equals(status) ||
                 PamConstants.AUTH0_API_OP_STATUS_PENDING.equals(status)) {
             return true;
